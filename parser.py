@@ -25,6 +25,6 @@ class Parser:
                 value = value.strip("')}")
                 if value != '':
                     squares = value.split(':')
-                    enpassants[pointer] = (extras.REVERT_CORD[squares[0]], extras.REVERT_CORD[squares[1]])
+                    enpassants[pointer] = (moonfish.revert_cord[squares[0]], moonfish.revert_cord[squares[1]])
                 pointer = (pointer + 1) % 4
             fen[6] = fen[7]
