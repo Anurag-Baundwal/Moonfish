@@ -19,7 +19,7 @@ def main():
     did_greeting = False
     game_start_log = True
     depth = nodes = 0
-    # book_handler = book.Book(0, "blank.book")
+    # book_handler = book.Book(0, "books/blank.book")
     did_not_game_search = True
     eval = mainline_book = start_fen = ""
     while True:
