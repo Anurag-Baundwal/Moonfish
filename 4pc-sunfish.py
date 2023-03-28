@@ -30,160 +30,172 @@ revert_cord = {"d14": 36, "e14": 37, "f14": 38, "g14": 39, "h14": 40, "i14": 41,
 
 coordinates = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "d14", "e14", "f14", "g14", "h14", "i14", "j14", "k14", 0, 0, 0, 0, 0, 0, 0, 0, "d13", "e13", "f13", "g13", "h13", "i13", "j13", "k13", 0, 0, 0, 0, 0, 0, 0, 0, "d12", "e12", "f12", "g12", "h12", "i12", "j12", "k12", 0, 0, 0, 0, 0, "a11", "b11", "c11", "d11", "e11", "f11", "g11", "h11", "i11", "j11", "k11", "l11", "m11", "n11", 0, 0, "a10", "b10", "c10", "d10", "e10", "f10", "g10", "h10", "i10", "j10", "k10", "l10", "m10", "n10", 0, 0, "a9", "b9", "c9", "d9", "e9", "f9", "g9", "h9", "i9", "j9", "k9", "l9", "m9", "n9", 0, 0, "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8", "i8",
                "j8", "k8", "l8", "m8", "n8", 0, 0, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", "i7", "j7", "k7", "l7", "m7", "n7", 0, 0, "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6", "i6", "j6", "k6", "l6", "m6", "n6", 0, 0, "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5", "i5", "j5", "k5", "l5", "m5", "n5", 0, 0, "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4", "i4", "j4", "k4", "l4", "m4", "n4", 0, 0, 0, 0, 0, "d3", "e3", "f3", "g3", "h3", "i3", "j3", "k3", 0, 0, 0, 0, 0, 0, 0, 0, "d2", "e2", "f2", "g2", "h2", "i2", "j2", "k2", 0, 0, 0, 0, 0, 0, 0, 0, "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-# self explanatory
 
-promotion = [(81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94), (43, 59, 75, 91, 107, 123, 139, 155, 171, 187, 203, 219, 235, 251),
-             (193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206), (36, 52, 68, 84, 100, 116, 132, 148, 164, 180, 196, 212, 228, 244)]
-# promotion squares
-# 4 tuples - one for each color
+# defines what keys we promote pawns on.
+promotion = [
+    (81,   82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94),
+    (43,   59,  75,  91, 107, 123, 139, 155, 171, 187, 203, 219, 235, 251),
+    (193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206),
+    (36,   52,  68,  84, 100, 116, 132, 148, 164, 180, 196, 212, 228, 244),
+]
 
-pstart = (52, 53, 54, 55, 56, 57, 58, 59, 82, 98, 114, 130, 146, 162, 178, 194,
-          93, 109, 125, 141, 157, 173, 189, 205, 228, 229, 230, 231, 232, 233, 234, 235)
-# starting positions of the pieces?
+# defines which squares pawns can move 2 squares.
+pstart = (52, 53, 54, 55, 56, 57, 58, 59,
+          82, 98, 114, 130, 146, 162, 178,
+          194, 93, 109, 125, 141, 157, 173,
+          189, 205, 228, 229, 230, 231, 232,
+          233, 234, 235)
 
+# material evaluation values.
 pvs = (100, 100, 100, 100, 300, 400, 525, 1025, 60000)
-# material values
 
+# for delta pruning.
 delta_margin = pvs[7]  # 1025 (Queen value)
+
+# extra search vars.
 infinity = 999999
-mate = infinity-100000
+mate = infinity - 100000
 
-
-class Position(namedtuple('Position', 'board score color')):
+class Position(namedtuple('Position', 'board score color enpassants castling')):
     def gen_moves(self):
         moves = []
+        # only loop through valid squares.
         for key in extras.VALID_KEYS:
-            if self.board[key] == 0 or self.board[key][0] != self.color:
-                continue  # empty square or piececolor != side to move
-            # self.board[key][1] selects the type of piece
+            # check to see if the current player to move owns this piece.
+            if self.board[key] == 0 or self.board[key][0] != self.color: continue
+            # loop through the pieces direction.
             for location in directions[self.board[key][1]]:
-                for keyr in count(key + location, location):  # keyr ?
-                    if keyr not in extras.VALID_KEYS:
-                        break
-                    elif self.board[keyr] == 0:
-                        captured = False
-                    elif self.board[keyr][0] == self.color or self.board[keyr][0] == colors[self.color]:
-                        break
-                    else:
-                        captured = True
-                    if self.board[keyr] in (0, 1, 2, 3) and location in (-16, 16, 1, -1, -32, 32, 2, -2) and captured:
-                        break
-                    if self.board[keyr] in (0, 1, 2, 3) and location in (-32, 32, 2, -2) and (key not in pstart or self.board[keyr-double_pawns[self.color]]) != 0:
-                        break
-                    if self.board[keyr] in (0, 1, 2, 3) and location in (-17, -15, 17, 15) and not captured:
-                        break
+                # loop in this direction (for sliders).
+                for keyr in count(key + location, location):
+                    # prevent moving pieces off the board.
+                    if keyr not in extras.VALID_KEYS: break
+                    # determine if this would be a capture.
+                    elif self.board[keyr] == 0: captured = False
+                    elif self.board[keyr][0] == self.color or self.board[keyr][0] == colors[self.color]: break
+                    else: captured = True
+                    # single pawn pushes.
+                    if self.board[key] in (0, 1, 2, 3) and location in (-16, 16, 1, -1, -32, 32, 2, -2) and captured: break
+                    # double pawn pushes.
+                    if self.board[key] in (0, 1, 2, 3) and location in (-32, 32, 2, -2) and (key not in pstart or self.board[keyr - double_pawns[self.color]]) != 0: break
+                    # pawn capture moves.
+                    if self.board[key] in (0, 1, 2, 3) and location in (-17, -15, 17, 15) and not captured: break
+                    # pawn ep_captures.
+                    if self.board[key] in (0,1,2,3) and location in (-17, -15, 17, 15) and (key + double_pawns[self.color], keyr) in self.enpassants: captured = True
+                    # add the move.
                     moves.append((key, keyr))
-                    if self.board[keyr] in (0, 1, 2, 3, 4, 8) or captured:
-                        break
+                    # prevent crawlers from crawling.
+                    if self.board[key] in (0, 1, 2, 3, 4, 8) or captured: break
+        # return non-legal moves.
         return moves
 
     def nullmove(self):
+        # preform a null-move.
         return Position(self.board, -self.score, (self.color+1) % 4)
 
     def move(self, move):
-        board, score = self.board[:], self.score
-        score = score+self.value(move)
-        if board[move[0]][1] in (0, 1, 2, 3) and move[1] in promotion[self.color]:
-            board[move[0]] = (self.color, 7)
+        # temp save the position data.
+        board, enpassants, castling, score = self.board[:],
+                                             self.enpassants[:],
+                                             self.castling[:],
+                                             self.score
+        score = score + self.value(move)
+        # auto promote to a queen.
+        if board[move[0]][1] in (0, 1, 2, 3) and move[1] in promotion[self.color]: board[move[0]] = (self.color, 7)
+        # move the piece.
         board[move[1]] = board[move[0]]
         board[move[0]] = 0
-        return Position(board, -score, (self.color+1) % 4)
+        # process ep_capture.
+        if (move[0] + double_pawns[self.color], move[1]) in self.enpassants: board[move[0] + double_pawns[self.color]] = 0
+        # return the new board state.
+        return Position(board, -score, (self.color + 1) % 4)
 
     def dead(self):
         pos = self.nullmove()
+        # check against the first opposing player.
         for move in pos.gen_moves():
-            if self.board[move[1]] != 0 and self.board[move[1]][1] == 8:
-                return True
-        pos = Position(self.board, -self.score, (self.color+2) % 4)
+            if self.board[move[1]] != 0 and self.board[move[1]][1] == 8: return True
+        pos = Position(self.board, -self.score, (self.color + 2) % 4)
+        # check against the second opposing player.
         for move in pos.gen_moves():
-            if self.board[move[1]] != 0 and self.board[move[1]][1] == 8:
-                return True
+            if self.board[move[1]] != 0 and self.board[move[1]][1] == 8: return True
         return False
 
     def value(self, move):
         score = 0
-        if self.board[move[1]] != 0:
-            score += pvs[self.board[move[1]][1]]
-        if self.board[move[0]][1] in (0, 1, 2, 3) and move[1] in promotion[self.color]:
-            score -= pvs[0]+pvs[7]
+        # calculate material eval by updating the score on every capture.
+        if self.board[move[1]] != 0: score += pvs[self.board[move[1]][1]]
+        # calculate queen promotion evaluation.
+        if self.board[move[0]][1] in (0, 1, 2, 3) and move[1] in promotion[self.color]: score -= pvs[0] + pvs[7]
+        # return the eval score.
         return score
 
     def hash(self):
         h = ''
         loop = iter(self.board[:])
         for square in loop:
-            if square == 0:
-                h += 'v'
-            else:
-                h += extras.indexing(square)
+            # calculate a character value for each square.
+            if square == 0: h += 'v'
+            else: h += extras.indexing(square)
+        # return the transposition table hash.
         return h
 
     def render(self):
         g = m = r = ""
         a = iter(self.board[:])
-        for c in range(36):
-            next(a)
+        for c in range(36): next(a)
         print("+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+\n")
         for d in range(3):
             for e in range(8):
                 f = next(a)
-                if f == 0:
-                    g += "     |"
-                else:
-                    g += " "+str(f[0])+"."+str(f[1])+" |"
+                if f == 0: g += "     |"
+                else: g += " " + str(f[0]) + "." + str(f[1]) + " |"
             if d < 2:
-                for h in range(8):
-                    next(a)
-            print("|-----|-----|-----|"+g+"-----|-----|-----|\n")
-            print(
-                "+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+\n")
+                for h in range(8): next(a)
+            print("|-----|-----|-----|" + g + "-----|-----|-----|\n")
+            print("+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+\n")
             g = ""
-        for j in range(5):
-            next(a)
+        for j in range(5): next(a)
         for k in range(8):
             for l in range(14):
                 t = next(a)
-                if t == 0:
-                    m += "     |"
-                else:
-                    m += " "+str(t[0])+"."+str(t[1])+" |"
+                if t == 0: m += "     |"
+                else: m += " " + str(t[0]) + "." + str(t[1]) + " |"
             if k < 7:
-                for i in range(2):
-                    next(a)
-            print("|"+m+"\n")
-            print(
-                "+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+\n")
+                for i in range(2): next(a)
+            print("|" + m + "\n")
+            print("+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+\n")
             m = ""
         for n in range(5):
             next(a)
         for o in range(3):
             for p in range(8):
                 q = next(a)
-                if q == 0:
-                    r += "     |"
-                else:
-                    r += " "+str(q[0])+"."+str(q[1])+" |"
+                if q == 0: r += "     |"
+                else: r += " " + str(q[0]) + "." + str(q[1]) + " |"
             if o < 2:
-                for s in range(8):
-                    next(a)
-            print("|-----|-----|-----|"+r+"-----|-----|-----|\n")
-            print(
-                "+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+\n")
+                for s in range(8): next(a)
+            print("|-----|-----|-----|" + r + "-----|-----|-----|\n")
+            print("+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+\n")
             r = ""
+
 class Search:
     def __init__(self):
+        # declare global class vars.
         self.nodes = 0
         self.tt_score = {}
         self.tt_move = {}
         self._ply = 0
         self._sel_depth = 0
+
     def preform(self, pos):
+        # reset nodes.
+        # reset tt score.
+        # reset ply.
         self.nodes = 0
         self.tt_score = {}
         self._ply = 0
         best_move = ()
         for depth in range(1, 1000):
-            self._sel_depth = 0
             best = alpha = -infinity
             beta = -alpha
             for move in self.sorted(pos):
@@ -258,3 +270,30 @@ class Search:
         for move in sorted(pos.gen_moves(), key=pos.value, reverse=True):
             if move == killer: continue
             yield move
+
+
+def main():
+    search = Search()
+    history = [Position(initial, 0, 0)]
+    history[-1].render()
+    x = 0
+    while True:
+        # Fire the engine up and search for a move.
+        start = time.time()
+        for move, depth, score in search.preform(history[-1]):
+            if time.time()-start > 6:
+                break
+        history.append(history[-1].move(move))
+        history[-1].render()
+        print("Depth Reached:"+str(depth)+"\n")
+        print("Nodes Reached:"+str(search.nodes)+"\n")
+        if history[-1].color in (1, 3):
+            print("Eval Score: "+str(-score)+"\n")
+        else:
+            print("Eval Score: "+str(score)+"\n")
+        if history[-1].dead():
+            break
+
+
+if __name__ == '__main__':
+    main()
