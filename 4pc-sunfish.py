@@ -77,10 +77,10 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
                     if self.board[key] in (0, 1, 2, 3) and location in (-16, 16, 1, -1, -32, 32, 2, -2) and captured: break
                     # double pawn pushes.
                     if self.board[key] in (0, 1, 2, 3) and location in (-32, 32, 2, -2) and (key not in pstart or self.board[keyr - double_pawns[self.color]]) != 0: break
-                    # pawn capture moves.
-                    if self.board[key] in (0, 1, 2, 3) and location in (-17, -15, 17, 15) and not captured: break
                     # pawn ep_captures.
                     if self.board[key] in (0,1,2,3) and location in (-17, -15, 17, 15) and (key + double_pawns[self.color], keyr) in self.enpassants: captured = True
+                    # pawn capture moves.
+                    if self.board[key] in (0, 1, 2, 3) and location in (-17, -15, 17, 15) and not captured: break
                     # add the move.
                     moves.append((key, keyr))
                     # prevent crawlers from crawling.
