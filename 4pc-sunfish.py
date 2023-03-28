@@ -213,26 +213,40 @@ class Search:
         self.tt_score = {}
         self._ply = 0
         best_move = ()
+        # preform a recursive depth-first search.
         for depth in range(1, 1000):
+            # set base vars.
             best = alpha = -infinity
             beta = -alpha
+            # sort through each move.
             for move in self.sorted(pos):
+                # increase the game ply.
                 self._ply += 1
+                # preform a recrusive negamax search.
                 score = -self.search(pos.move(move), -beta, -alpha, depth - 1)
+                # decrease the game ply.
                 self._ply -= 1
                 if score >= beta:
+                    # store and update the best score/move.
+                    # also this is a beta cutoff, break the search.
                     best_move = move
                     best = score
                     break
                 if score > best:
+                    # store and update the best score/move.
                     best_move = move
                     best = score
                     alpha = max(alpha, score)
+            # yield the best move for this depth-search.
             yield best_move, depth, self._sel_depth, best
+
     def search(self, pos, alpha, beta, depth=3):
         self.nodes += 1
+        # calculate the sel depth.
         if (self._ply > self._sel_depth) self._sel_depth = self._ply;
+        # detect mate.
         if pos.dead(): return -mate + self._ply
+        # mate distance pruning.
         mating_value = mate - self._ply
         if mating_value < beta:
             beta = mating_value
@@ -241,50 +255,76 @@ class Search:
         if mated_value > alpha:
             alpha = mated_value
             if beta <= mated_value: return mated_value
+        # save the original alpha score.
+        o_alpha = alpha
+        # prevent negitive depths in the tt table.
         depth = max(depth, 0)
+        # tt table lookup.
         entry = self.tt_score.get(pos.hash())
         if entry and entry[1] >= depth:
             if entry[0] == 0: return entry[2]
             elif entry[0] == -1: alpha = max(alpha, entry[2])
             elif entry[1] == 1: beta = min(beta, entry[2])
             if alpha >= beta: return entry[2]
+        # if this node is terminal then preform a qsearch instead.
         if depth <= 0: return self.qsearch(pos, alpha, beta, ply+1)
-        o_alpha = alpha
         best = -infinity
         for move in self.sorted(pos):
+            # increase the game ply.
             self._ply += 1
+            # preform a recrusive negamax search.
             score = -self.search(pos.move(move), -beta, -alpha, depth - 1)
+            # decrease the game ply.
             self._ply -= 1
             if score >= beta:
+                # store and update the best score/move.
+                # also this is a beta cutoff, break the search.
                 self.tt_move[pos.hash()] = move
                 best = score
                 break
             if score > best:
+                # store and update the best score/move.
                 self.tt_move[pos.hash()] = move
                 best = score
                 alpha = max(alpha, score)
+        # transposition table store/update.
         if best <= o_alpha: self.tt_score[pos.hash()] = (1, depth, best)
         elif best >= beta: self.tt_score[pos.hash()] = (-1, depth, best)
         else: self.tt_score[pos.hash()] = (0, depth, best)
+        # return the best possible score.
         return best
+
     def qsearch(self, pos, alpha, beta, ply):
         self.nodes += 1
+        # detect mate.
         if pos.dead(): return -mate + self._ply
+        # get the material eval score.
         score = pos.score
+        # alpha/beta pruning.
         if score >= beta: return beta
+        # delta pruning.
         if score < alpha - delta_margin: return alpha
         alpha = max(alpha, score)
+        # loop through every capture move.
         for move in self.sorted(pos):
+            # check to see if this move is quiet.
             if pos.board[move[1]] == 0: continue
+            # increase the game ply.
             self._ply += 1
+            # preform a recrusive qsearch.
             score = -self.qsearch(pos.move(move), -beta, -alpha, ply+1)
+            # decrease the game ply.
             self._ply -= 1
+            # alpha/beta pruning.
             if score >= beta: return beta
             if score > alpha: alpha = score
         return alpha
+
     def sorted(self, pos):
+        # attempt to get the killer move (aka PV move).
         killer = self.tt_move.get(pos.hash())
         if killer: yield killer
-        for move in sorted(pos.gen_moves(), key=pos.value, reverse=True):
+        # sort the moves based on move value.
+        for move in sorted(pos.gen_moves(), key = pos.value, reverse = True):
             if move == killer: continue
             yield move
