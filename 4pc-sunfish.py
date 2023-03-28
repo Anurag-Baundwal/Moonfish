@@ -183,6 +183,7 @@ class Search:
         self._ply = 0
         best_move = ()
         for depth in range(1, 1000):
+            self._sel_depth = 0
             best = alpha = -infinity
             beta = -alpha
             for move in self.sorted(pos):
