@@ -6,8 +6,8 @@ from engine import EngineFPC
 
 def main():
     api_handler = api.Api(
-        "https://variants.gcp-prod.chess.com/bot", "FG34sd7GLj", "v2.0.0-beta")
-    engine_handler = EngineFPC("Vemory.exe", api_handler)
+        "https://variants.gcp-prod.chess.com/bot", "SK3slkj3Da", "v2.0.0-beta")
+    engine_handler = EngineFPC("4pc-sunfish.py", api_handler)
     # https://variants.gcp-sandbox.chess-platform.com/bot/
     # https://variants.gcp-prod.chess.com/bot
     start_fen_rbg = "R-0,0,0,0-1,1,1,1-1,1,1,1-0,0,0,0-0-x,x,x,yR,yN,yB,yK,yQ,yB,yN,yR,x,x,x/x,x,x,yP,yP,yP,yP,yP,yP,yP,yP,x,x,x/x,x,x,8,x,x,x/bR,bP,10,gP,gR/bN,bP,10,gP,gN/bB,bP,10,gP,gB/bQ,bP,10,gP,gK/bK,bP,10,gP,gQ/bB,bP,10,gP,gB/bN,bP,10,gP,gN/bR,bP,10,gP,gR/x,x,x,8,x,x,x/x,x,x,rP,rP,rP,rP,rP,rP,rP,rP,x,x,x/x,x,x,rR,rN,rB,rK,rQ,rB,rN,rR,x,x,x"
