@@ -288,30 +288,3 @@ class Search:
         for move in sorted(pos.gen_moves(), key=pos.value, reverse=True):
             if move == killer: continue
             yield move
-
-
-def main():
-    search = Search()
-    history = [Position(initial, 0, 0)]
-    history[-1].render()
-    x = 0
-    while True:
-        # Fire the engine up and search for a move.
-        start = time.time()
-        for move, depth, score in search.preform(history[-1]):
-            if time.time()-start > 6:
-                break
-        history.append(history[-1].move(move))
-        history[-1].render()
-        print("Depth Reached:"+str(depth)+"\n")
-        print("Nodes Reached:"+str(search.nodes)+"\n")
-        if history[-1].color in (1, 3):
-            print("Eval Score: "+str(-score)+"\n")
-        else:
-            print("Eval Score: "+str(score)+"\n")
-        if history[-1].dead():
-            break
-
-
-if __name__ == '__main__':
-    main()
