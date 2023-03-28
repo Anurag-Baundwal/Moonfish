@@ -10,11 +10,11 @@ except ImportError:
     from http.client import BadStatusLine as RemoteDisconnected
 import backoff
 ENDPOINTS={
-    "arrow":  "?token={}&arrows={}",
-    "chat":   "?token={}&chat={}",
-    "play":   "?token={}&play={}",
-    "resign": "?token={}&play=R",
-    "stream": "?token={}&stream=1"
+    "arrow":  "?token=d545syfDfy&arrows=h2-h4",
+    "chat":   "?token=d545syfDfy&chat=hello",
+    "play":   "?token=d545syfDfy&play=h2-h4",
+    "resign": "?token=d545syfDfy&play=R",
+    "stream": "?token=d545syfDfy&stream=1"
 }
 class Api():
     def __init__(self, url: str, token: str, bot_name: str = "?", version: str = "v1.0.0"):
