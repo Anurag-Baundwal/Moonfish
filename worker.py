@@ -1,13 +1,14 @@
 import book
 import api
 import json
+import sys
 from engine import EngineFPC
 
 
 def main():
     api_handler = api.Api(
         "https://variants.gcp-prod.chess.com/bot", "SK3slkj3Da", "v2.0.0-beta")
-    engine_handler = EngineFPC("4pc-sunfish.py", api_handler)
+    engine_handler = EngineFPC(f"{sys.executable} 4pc-sunfish.py", api_handler)
     # https://variants.gcp-sandbox.chess-platform.com/bot/
     # https://variants.gcp-prod.chess.com/bot
     start_fen_rbg = "R-0,0,0,0-1,1,1,1-1,1,1,1-0,0,0,0-0-x,x,x,yR,yN,yB,yK,yQ,yB,yN,yR,x,x,x/x,x,x,yP,yP,yP,yP,yP,yP,yP,yP,x,x,x/x,x,x,8,x,x,x/bR,bP,10,gP,gR/bN,bP,10,gP,gN/bB,bP,10,gP,gB/bQ,bP,10,gP,gK/bK,bP,10,gP,gQ/bB,bP,10,gP,gB/bN,bP,10,gP,gN/bR,bP,10,gP,gR/x,x,x,8,x,x,x/x,x,x,rP,rP,rP,rP,rP,rP,rP,rP,x,x,x/x,x,x,rR,rN,rB,rK,rQ,rB,rN,rR,x,x,x"
@@ -18,7 +19,7 @@ def main():
     did_greeting = False
     game_start_log = True
     depth = nodes = 0
-    book_handler = book.Book(0, "blank.book")
+    # book_handler = book.Book(0, "blank.book")
     did_not_game_search = True
     eval = mainline_book = start_fen = ""
     while True:
@@ -45,17 +46,19 @@ def main():
                     if state['info'] == "it's your turn":
                         san = state['move']['san']
                         if not did_greeting:
-                            mainline_book += san
+                            # mainline_book += san
                             did_greeting = True
                         else:
-                            mainline_book += " " + san
-                        book_move = book_handler.get_book_move(mainline_book)
-                        if book_move != "":
-                            print("_________________________________")
-                            print("Playing book move `" + book_move + "`.`")
-                            api_handler.play(book_move)
-                            mainline_book += " " + book_move
-                        else:
+                            # mainline_book += " " + san
+                        # book_move = book_handler.get_book_move(mainline_book)
+                        # if book_move != "":
+                        #     print("_________________________________")
+                        #     print("Playing book move `" + book_move + "`.`")
+                        #     api_handler.play(book_move)
+                        #     mainline_book += " " + book_move
+                        
+                        
+                        # else: # indent lines 62-77 (both inclusive) when uncommenting and trying to add book again
                             print("_________________________________")
                             print("Looking for an engine move...")
                             print("_________________________________")
@@ -79,14 +82,15 @@ def main():
                     if "info" in state and state['info'] == "it's your turn":
                         if not did_greeting:
                             did_greeting = True
-                        book_move = book_handler.get_book_move(mainline_book)
-                        if book_move != "":
-                            print("_________________________________")
-                            print("Playing book move `" + book_move + "`.`")
-                            # sleep(1)
-                            api_handler.play(book_move)
-                            mainline_book += book_move
-                        else:
+                        # book_move = book_handler.get_book_move(mainline_book)
+                        # if book_move != "":
+                        #     print("_________________________________")
+                        #     print("Playing book move `" + book_move + "`.`")
+                        #     # sleep(1)
+                        #     api_handler.play(book_move)
+                        #     mainline_book += book_move
+                        
+                        # else:
                             print("_________________________________")
                             print("Looking for an engine move...")
                             print("_________________________________")
