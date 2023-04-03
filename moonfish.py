@@ -61,10 +61,12 @@ promotion_keys = [
     (36,   52,  68,  84, 100, 116, 132, 148, 164, 180, 196, 212, 228, 244),
 ]
 
-# defines which squares pawns can move 2 squares.
-pawn_start_keys = (52, 53, 54, 55, 56, 57, 58, 59, 82, 98, 114, 130, 146, 162, 178, 194, 93, 109, 125, 141, 157, 173, 189, 205, 228, 229, 230, 231, 232, 233, 234, 235)
+# starting squares for the pawns
+# pawns on these squares can move 2 steps 
+pawn_starting_keys = (52, 53, 54, 55, 56, 57, 58, 59, 82, 98, 114, 130, 146, 162, 178, 194, 93, 109, 125, 141, 157, 173, 189, 205, 228, 229, 230, 231, 232, 233, 234, 235)
 
 # material evaluation values.
+# pvs = piece value scores ?
 pvs = (100, 100, 100, 100, 300, 400, 525, 1025, 60000)
 
 # for delta pruning.
@@ -77,49 +79,56 @@ mate = infinity - 100000
 class Position(namedtuple('Position', 'board score color enpassants castling')):
     def gen_moves(self):
         moves = []
-        # only loop through valid squares.
         for key in extras.VALID_KEYS:
-            # check to see if the current player to move owns this piece.
             if self.board[key] == 0 or self.board[key][0] != self.color: continue
+            
+            # Note: key = the square the piece starts at
+            #       keyr = the square the piece lands on
+
             # loop through the pieces direction.
-            for location in directions[self.board[key][1]]:
+            for dir in directions[self.board[key][1]]:
                 # loop in this direction (for sliders).
-                for keyr in count(key + location, location):
-                    # prevent moving pieces off the board.
+                for keyr in count(key + dir, dir):
                     if keyr not in extras.VALID_KEYS: break
+                    
                     # determine if this would be a capture.
-                    elif self.board[keyr] == 0: captured = False
-                    elif self.board[keyr][0] == self.color or self.board[keyr][0] == colors[self.color]: break
-                    else: captured = True
+                    elif self.board[keyr] == 0: is_capture = False # landed on an empty square = not a capture
+                    elif self.board[keyr][0] == self.color or self.board[keyr][0] == colors[self.color]: break # captured friendly piece
+                    else: is_capture = True
+                    
+                    # pawn moves
                     # single pawn pushes.
-                    if self.board[key] in (0, 1, 2, 3) and location in (-16, 16, 1, -1, -32, 32, 2, -2) and captured: break
+                    if self.board[key] in (0, 1, 2, 3) and dir in (-16, 16, 1, -1, -32, 32, 2, -2) and is_capture: break
                     # double pawn pushes.
-                    if self.board[key] in (0, 1, 2, 3) and location in (-32, 32, 2, -2) and (key not in pawn_start_keys or self.board[keyr - double_pawns[self.color]]) != 0: break
+                    if self.board[key] in (0, 1, 2, 3) and dir in (-32, 32, 2, -2) and (key not in pawn_starting_keys or self.board[keyr - double_pawns[self.color]]) != 0: break
                     # pawn ep_captures.
-                    if self.board[key] in (0,1,2,3) and location in (-17, -15, 17, 15) and (key + double_pawns[self.color], keyr) in self.enpassants: captured = True
+                    if self.board[key] in (0,1,2,3) and dir in (-17, -15, 17, 15) and (key + double_pawns[self.color], keyr) in self.enpassants: is_capture = True
                     # pawn capture moves.
-                    if self.board[key] in (0, 1, 2, 3) and location in (-17, -15, 17, 15) and not captured: break
+                    if self.board[key] in (0, 1, 2, 3) and dir in (-17, -15, 17, 15) and not is_capture: break
+                    
                     # add the move.
                     moves.append((key, keyr))
+                    
                     # prevent crawlers (pawn, knight, king) from crawling.
-                    if self.board[key] in (0, 1, 2, 3, 4, 8) or captured: break
+                    if self.board[key] in (0, 1, 2, 3, 4, 8) or is_capture: break
         # return non-legal moves.
         return moves
 
     def nullmove(self):
-        # preform a null-move.
         return Position(self.board, -self.score, (self.color+1) % 4)
 
     def move(self, move):
         # temp save the position data.
         board, enpassants, castling, score = self.board[:], self.enpassants[:], self.castling[:], self.score
         score = score + self.value(move)
+        
         # auto promote to a queen.
-
         if board[move[0]][1] in (0, 1, 2, 3) and move[1] in promotion_keys[self.color]: board[move[0]] = (self.color, 7)
-        # move the piece.
-        board[move[1]] = board[move[0]]
-        board[move[0]] = 0
+        
+        # move the piece
+        board[move[1]] = board[move[0]] # move the piece to the target square            
+        board[move[0]] = 0              # empty the starting square
+        
         # process ep_capture.
         if (move[0] + double_pawns[self.color], move[1]) in self.enpassants: board[move[0] + double_pawns[self.color]] = 0
         # return the new board state.
