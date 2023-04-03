@@ -222,7 +222,8 @@ class Search:
                 # increase the game ply.
                 self._ply += 1
                 # preform a recrusive negamax search.
-                score = -self.search(pos.move(move), -beta, -alpha, depth - 1)
+                if pos.board[move[1]] != 0 and pos.board[move[1]][1] == 8: return mate - self._ply
+                else: score = -self.search(pos.move(move), -beta, -alpha, depth - 1)
                 # decrease the game ply.
                 self._ply -= 1
                 if score >= beta:
@@ -271,8 +272,9 @@ class Search:
         for move in self.sorted(pos):
             # increase the game ply.
             self._ply += 1
-            # perform a recrusive negamax search.
-            score = -self.search(pos.move(move), -beta, -alpha, depth - 1)
+            # preform a recrusive negamax search.
+            if pos.board[move[1]] != 0 and pos.board[move[1]][1] == 8: return mate - self._ply
+            else: score = -self.search(pos.move(move), -beta, -alpha, depth - 1)
             # decrease the game ply.
             self._ply -= 1
             if score >= beta:
@@ -311,7 +313,8 @@ class Search:
             # increase the game ply.
             self._ply += 1
             # preform a recrusive qsearch.
-            score = -self.qsearch(pos.move(move), -beta, -alpha, ply+1)
+            if pos.board[move[1]] != 0 and pos.board[move[1]][1] == 8: return mate - self._ply
+            else: score = -self.qsearch(pos.move(move), -beta, -alpha, ply+1)
             # decrease the game ply.
             self._ply -= 1
             # alpha/beta pruning.
