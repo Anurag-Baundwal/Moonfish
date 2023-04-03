@@ -27,22 +27,22 @@ initial = [
     0,      0,      0, 0, (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), 0,      0,      0, 0,
     0,      0,      0, 0, (0, 6), (0, 4), (0, 5), (0, 7), (0, 8), (0, 5), (0, 4), (0, 6), 0,      0,      0, 0,
     0,      0,      0, 0,      0,      0,      0,      0,      0,      0,      0,      0, 0,      0,      0, 0,
-    0,      0,      0, 0,      0,      0,      0,      0,      0,      0,      0,      0, 0,      0,      0, 0,
+    0,      0,      0, 0,      0,      0,      0,      0,      0,      0,      0,      0, 0,      0,      0, 0, ]
 
 # valid squares.
 valid_keys = (36, 37, 38, 39, 40, 41, 42, 43, 52, 53, 54, 55, 56, 57, 58, 59, 68, 69, 70, 71, 72, 73, 74, 75, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 145, 146, 147,148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 212, 213, 214, 215, 216, 217, 218, 219, 228, 229, 230, 231, 232, 233, 234, 235, 244, 245, 246, 247, 248, 249, 250, 251)
 
 # direction offsets to move pieces
 directions = [
-    (-16, -32, -15, -17),
-    (  1,   2, -15,  17),
-    ( 16,  32,  15,  17),
-    ( -1,  -2, -17,  15),
-    (-33,  33, -31,  31, 18, -18, 14, -14),
-    (-17, -15,  17,  15),
-    (  1,  -1,  16, -16),
-    (  1,  -1,  16, -16, -17, -15, 17, 15),
-    (  1,  -1,  16, -16, -17, -15, 17, 15),
+    (-16, -32, -15, -17), # red pawn
+    (  1,   2, -15,  17), # blue pawn
+    ( 16,  32,  15,  17), # yellow pawn
+    ( -1,  -2, -17,  15), # green pawn
+    (-33,  33, -31,  31, 18, -18, 14, -14), # knight
+    (-17, -15,  17,  15), # bishop
+    (  1,  -1,  16, -16), # rook
+    (  1,  -1,  16, -16, -17, -15, 17, 15), # queen 
+    (  1,  -1,  16, -16, -17, -15, 17, 15), # king 
 ]
 
 # helper to figure out the reverse coordinate for a key.
@@ -54,7 +54,7 @@ coordinates = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                "j8", "k8", "l8", "m8", "n8", 0, 0, "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", "i7", "j7", "k7", "l7", "m7", "n7", 0, 0, "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6", "i6", "j6", "k6", "l6", "m6", "n6", 0, 0, "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5", "i5", "j5", "k5", "l5", "m5", "n5", 0, 0, "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4", "i4", "j4", "k4", "l4", "m4", "n4", 0, 0, 0, 0, 0, "d3", "e3", "f3", "g3", "h3", "i3", "j3", "k3", 0, 0, 0, 0, 0, 0, 0, 0, "d2", "e2", "f2", "g2", "h2", "i2", "j2", "k2", 0, 0, 0, 0, 0, 0, 0, 0, "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 # defines what keys we promote pawns on.
-promotion = [
+promotion_keys = [
     (81,   82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94),
     (43,   59,  75,  91, 107, 123, 139, 155, 171, 187, 203, 219, 235, 251),
     (193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206),
@@ -62,7 +62,7 @@ promotion = [
 ]
 
 # defines which squares pawns can move 2 squares.
-pstart = (52, 53, 54, 55, 56, 57, 58, 59, 82, 98, 114, 130, 146, 162, 178, 194, 93, 109, 125, 141, 157, 173, 189, 205, 228, 229, 230, 231, 232, 233, 234, 235)
+pawn_start_keys = (52, 53, 54, 55, 56, 57, 58, 59, 82, 98, 114, 130, 146, 162, 178, 194, 93, 109, 125, 141, 157, 173, 189, 205, 228, 229, 230, 231, 232, 233, 234, 235)
 
 # material evaluation values.
 pvs = (100, 100, 100, 100, 300, 400, 525, 1025, 60000)
@@ -94,14 +94,14 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
                     # single pawn pushes.
                     if self.board[key] in (0, 1, 2, 3) and location in (-16, 16, 1, -1, -32, 32, 2, -2) and captured: break
                     # double pawn pushes.
-                    if self.board[key] in (0, 1, 2, 3) and location in (-32, 32, 2, -2) and (key not in pstart or self.board[keyr - double_pawns[self.color]]) != 0: break
+                    if self.board[key] in (0, 1, 2, 3) and location in (-32, 32, 2, -2) and (key not in pawn_start_keys or self.board[keyr - double_pawns[self.color]]) != 0: break
                     # pawn ep_captures.
                     if self.board[key] in (0,1,2,3) and location in (-17, -15, 17, 15) and (key + double_pawns[self.color], keyr) in self.enpassants: captured = True
                     # pawn capture moves.
                     if self.board[key] in (0, 1, 2, 3) and location in (-17, -15, 17, 15) and not captured: break
                     # add the move.
                     moves.append((key, keyr))
-                    # prevent crawlers from crawling.
+                    # prevent crawlers (pawn, knight, king) from crawling.
                     if self.board[key] in (0, 1, 2, 3, 4, 8) or captured: break
         # return non-legal moves.
         return moves
@@ -112,13 +112,11 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
 
     def move(self, move):
         # temp save the position data.
-        board, enpassants, castling, score = self.board[:],
-                                             self.enpassants[:],
-                                             self.castling[:],
-                                             self.score
+        board, enpassants, castling, score = self.board[:], self.enpassants[:], self.castling[:], self.score
         score = score + self.value(move)
         # auto promote to a queen.
-        if board[move[0]][1] in (0, 1, 2, 3) and move[1] in promotion[self.color]: board[move[0]] = (self.color, 7)
+
+        if board[move[0]][1] in (0, 1, 2, 3) and move[1] in promotion_keys[self.color]: board[move[0]] = (self.color, 7)
         # move the piece.
         board[move[1]] = board[move[0]]
         board[move[0]] = 0
@@ -127,6 +125,7 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
         # return the new board state.
         return Position(board, -score, (self.color + 1) % 4)
 
+    # function to check whether we are mated
     def dead(self):
         pos = self.nullmove()
         # check against the first opposing player.
@@ -143,7 +142,7 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
         # calculate material eval by updating the score on every capture.
         if self.board[move[1]] != 0: score += pvs[self.board[move[1]][1]]
         # calculate queen promotion evaluation.
-        if self.board[move[0]][1] in (0, 1, 2, 3) and move[1] in promotion[self.color]: score -= pvs[0] + pvs[7]
+        if self.board[move[0]][1] in (0, 1, 2, 3) and move[1] in promotion_keys[self.color]: score -= pvs[0] + pvs[7]
         # return the eval score.
         return score
 
@@ -205,7 +204,7 @@ class Search:
         self._ply = 0
         self._sel_depth = 0
 
-    def preform(self, pos):
+    def perform(self, pos):
         # reset nodes.
         # reset tt score.
         # reset ply.
@@ -213,7 +212,7 @@ class Search:
         self.tt_score = {}
         self._ply = 0
         best_move = ()
-        # preform a recursive depth-first search.
+        # perform a recursive depth-first search.
         for depth in range(1, 1000):
             # set base vars.
             best = alpha = -infinity
@@ -243,7 +242,7 @@ class Search:
     def search(self, pos, alpha, beta, depth=3):
         self.nodes += 1
         # calculate the sel depth.
-        if (self._ply > self._sel_depth) self._sel_depth = self._ply;
+        if (self._ply > self._sel_depth): self._sel_depth = self._ply
         # detect mate.
         if pos.dead(): return -mate + self._ply
         # mate distance pruning.
@@ -266,13 +265,13 @@ class Search:
             elif entry[0] == -1: alpha = max(alpha, entry[2])
             elif entry[1] == 1: beta = min(beta, entry[2])
             if alpha >= beta: return entry[2]
-        # if this node is terminal then preform a qsearch instead.
+        # if this node is terminal then perform a qsearch instead.
         if depth <= 0: return self.qsearch(pos, alpha, beta, ply+1)
         best = -infinity
         for move in self.sorted(pos):
             # increase the game ply.
             self._ply += 1
-            # preform a recrusive negamax search.
+            # perform a recrusive negamax search.
             score = -self.search(pos.move(move), -beta, -alpha, depth - 1)
             # decrease the game ply.
             self._ply -= 1
