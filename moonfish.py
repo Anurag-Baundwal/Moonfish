@@ -11,7 +11,11 @@ from collections import namedtuple
 colors = (2, 3, 0, 1)
 double_pawns = (-16, 1, 16, -1)
 
-# initial start pos.
+# for render method
+color_dict = {0: "r", 1: "b", 2: "y", 3: "g"}
+piece_dict = {0: "p", 1: "p", 2: "p", 3: "p", 4: "B", 5: "N", 6: "R", 7: "Q", 8: "K"}
+
+# initial position for new setup
 initial = [
     0,      0,      0, 0,      0,      0,      0,      0,      0,      0,      0,      0, 0,      0,      0, 0,
     0,      0,      0, 0,      0,      0,      0,      0,      0,      0,      0,      0, 0,      0,      0, 0,
@@ -21,8 +25,8 @@ initial = [
     0, (1, 6), (1, 1), 0,      0,      0,      0,      0,      0,      0,      0,      0, 0, (3, 3), (3, 6), 0,
     0, (1, 4), (1, 1), 0,      0,      0,      0,      0,      0,      0,      0,      0, 0, (3, 3), (3, 4), 0,
     0, (1, 5), (1, 1), 0,      0,      0,      0,      0,      0,      0,      0,      0, 0, (3, 3), (3, 5), 0, 
-    0, (1, 8), (1, 1), 0,      0,      0,      0,      0,      0,      0,      0,      0, 0, (3, 3), (3, 7), 0,
     0, (1, 7), (1, 1), 0,      0,      0,      0,      0,      0,      0,      0,      0, 0, (3, 3), (3, 8), 0,
+    0, (1, 8), (1, 1), 0,      0,      0,      0,      0,      0,      0,      0,      0, 0, (3, 3), (3, 7), 0,
     0, (1, 5), (1, 1), 0,      0,      0,      0,      0,      0,      0,      0,      0, 0, (3, 3), (3, 5), 0,
     0, (1, 4), (1, 1), 0,      0,      0,      0,      0,      0,      0,      0,      0, 0, (3, 3), (3, 4), 0,
     0, (1, 6), (1, 1), 0,      0,      0,      0,      0,      0,      0,      0,      0, 0, (3, 3), (3, 6), 0,
@@ -171,6 +175,7 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
         # return the transposition table hash.
         return h
 
+    # To-Do: Add coordinates at the boarder of the board
     def render(self):
         g = m = r = ""
         a = iter(self.board[:])
@@ -180,7 +185,8 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
             for e in range(8):
                 f = next(a)
                 if f == 0: g += "     |"
-                else: g += " " + str(f[0]) + "." + str(f[1]) + " |"
+                #else: g += " " + str(f[0]) + "." + str(f[1]) + " |"
+                else: g += " " + color_dict[f[0]] + "." + piece_dict[f[1]] + " |"
             if d < 2:
                 for h in range(8): next(a)
             print("|-----|-----|-----|" + g + "-----|-----|-----|\n")
@@ -191,7 +197,8 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
             for l in range(14):
                 t = next(a)
                 if t == 0: m += "     |"
-                else: m += " " + str(t[0]) + "." + str(t[1]) + " |"
+                #else: m += " " + str(t[0]) + "." + str(t[1]) + " |"
+                else: m += " " + color_dict[t[0]] + "." + piece_dict[t[1]] + " |"
             if k < 7:
                 for i in range(2): next(a)
             print("|" + m + "\n")
@@ -203,7 +210,8 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
             for p in range(8):
                 q = next(a)
                 if q == 0: r += "     |"
-                else: r += " " + str(q[0]) + "." + str(q[1]) + " |"
+                #else: r += " " + str(q[0]) + "." + str(q[1]) + " |"
+                else: r += " " + color_dict[q[0]] + "." + piece_dict[q[1]] + " |"
             if o < 2:
                 for s in range(8): next(a)
             print("|-----|-----|-----|" + r + "-----|-----|-----|\n")
