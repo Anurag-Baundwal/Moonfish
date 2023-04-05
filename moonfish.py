@@ -175,7 +175,7 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
         # return the transposition table hash.
         return h
 
-    # To-Do: Add coordinates at the boarder of the board
+    # To-Do: Add coordinates at the border of the board
     def render(self):
         g = m = r = ""
         a = iter(self.board[:])
