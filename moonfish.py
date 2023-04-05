@@ -1,5 +1,8 @@
 #!/usr/bin/env pypy
 # -*- coding: utf-8 -*-
+
+#TO-DO: Handle En Passant and Castling
+import time
 import api, extras
 from itertools import count
 from collections import namedtuple
@@ -115,7 +118,8 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
         return moves
 
     def nullmove(self):
-        return Position(self.board, -self.score, (self.color+1) % 4)
+        #return Position(self.board, -self.score, (self.color+1) % 4)
+        return Position(self.board, -self.score, (self.color+1) % 4, [], [])
 
     def move(self, move):
         # temp save the position data.
@@ -132,7 +136,8 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
         # process ep_capture.
         if (move[0] + double_pawns[self.color], move[1]) in self.enpassants: board[move[0] + double_pawns[self.color]] = 0
         # return the new board state.
-        return Position(board, -score, (self.color + 1) % 4)
+        #return Position(board, -score, (self.color + 1) % 4)
+        return Position(board, -score, (self.color + 1) % 4, [], [])
 
     # function to check whether we are mated
     def dead(self):
@@ -140,7 +145,8 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
         # check against the first opposing player.
         for move in pos.gen_moves():
             if self.board[move[1]] != 0 and self.board[move[1]][1] == 8: return True
-        pos = Position(self.board, -self.score, (self.color + 2) % 4)
+        #pos = Position(self.board, -self.score, (self.color + 2) % 4)
+        pos = Position(self.board, -self.score, (self.color + 2) % 4, [], [])
         # check against the second opposing player.
         for move in pos.gen_moves():
             if self.board[move[1]] != 0 and self.board[move[1]][1] == 8: return True
@@ -276,7 +282,7 @@ class Search:
             elif entry[1] == 1: beta = min(beta, entry[2])
             if alpha >= beta: return entry[2]
         # if this node is terminal then perform a qsearch instead.
-        if depth <= 0: return self.qsearch(pos, alpha, beta, ply+1)
+        if depth <= 0: return self.qsearch(pos, alpha, beta, ply+1) # bug in this line: "NameError: name 'ply' is not defined"
         best = -infinity
         for move in self.sorted(pos):
             # increase the game ply.
@@ -339,3 +345,30 @@ class Search:
         for move in sorted(pos.gen_moves(), key = pos.value, reverse = True):
             if move == killer: continue
             yield move
+
+def main():
+    search = Search()
+    #history = [Position(initial, 0, 0)]
+    history = [Position(initial, 0, 0, [], [])]
+    history[-1].render()
+    x = 0
+    while True:
+        # Fire the engine up and search for a move.
+        start = time.time()
+        for move, depth, score in search.perform(history[-1]):
+            if time.time()-start > 6:
+                break
+        history.append(history[-1].move(move))
+        history[-1].render()
+        print("Depth Reached:"+str(depth)+"\n")
+        print("Nodes Reached:"+str(search.nodes)+"\n")
+        if history[-1].color in (1, 3):
+            print("Eval Score: "+str(-score)+"\n")
+        else:
+            print("Eval Score: "+str(score)+"\n")
+        if history[-1].dead():
+            break
+
+
+if __name__ == '__main__':
+    main()
