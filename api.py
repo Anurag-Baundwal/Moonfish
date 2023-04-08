@@ -13,11 +13,12 @@ import backoff
 
 # url enpoints.
 ENDPOINTS={
-    "arrow":  "?token={}&arrows={}",
-    "chat":   "?token={}&chat={}",
-    "play":   "?token={}&play={}",
-    "resign": "?token={}&play=R",
-    "stream": "?token={}&stream=1"
+    "arrow":            "?token={}&arrows={}",
+    "chat":             "?token={}&chat={}",
+    "play":             "?token={}&play={}",
+    "play_selfpartner": "?token={}&play={}&playerId={}",
+    "resign":           "?token={}&play=R",
+    "stream":           "?token={}&stream=1"
 }
 
 class Api():
@@ -57,6 +58,10 @@ class Api():
     def play(self, move: str):
         # send the move to play.
         return self.api_get(ENDPOINTS["play"].format(self.token, move))
+
+    def play_selfpartner(self, move: str, botId: str):
+        # send the move to play.
+        return self.api_get(ENDPOINTS["play_selfpartner"].format(self.token, move, botId))
 
     def chat(self, message: str):
         # send a message to the chat.
