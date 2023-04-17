@@ -95,6 +95,14 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
             # loop through the pieces direction.
             for dir in directions[self.board[key][1]]:
                 # loop in this direction (for sliders).
+                
+                # To replace the below for loop with a while loop:
+                # keyr = key + location
+                # while keyr in extras.VALID_KEYS:
+                #    # Perform the operations inside the loop
+                #    # ...
+
+                #    keyr += location
                 for keyr in count(key + dir, dir):
                     if keyr not in extras.VALID_KEYS: break
                     
@@ -157,7 +165,7 @@ class Position(namedtuple('Position', 'board score color enpassants castling')):
         return False
 
     def value(self, move):
-        score = 0
+        score = 0 # ??
         # calculate material eval by updating the score on every capture.
         if self.board[move[1]] != 0: score += pvs[self.board[move[1]][1]]
         # calculate queen promotion evaluation.
@@ -290,7 +298,7 @@ class Search:
             elif entry[1] == 1: beta = min(beta, entry[2])
             if alpha >= beta: return entry[2]
         # if this node is terminal then perform a qsearch instead.
-        if depth <= 0: return self.qsearch(pos, alpha, beta, ply+1) # bug in this line: "NameError: name 'ply' is not defined"
+        if depth <= 0: return self.qsearch(pos, alpha, beta, self._ply+1) # bug in this line: "NameError: name 'ply' is not defined"
         best = -infinity
         for move in self.sorted(pos):
             # increase the game ply.

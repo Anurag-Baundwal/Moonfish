@@ -1,11 +1,6 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\abc\\Lib",
-    "\\abc\\Lib\\site-packages",
-    "\\abc\\Lib\\site-packages\\pip",
-    "\\abc\\Lib\\site-packages\\pip\\_vendor",
-    "\\abc\\Lib\\site-packages\\pip\\_vendor\\rich"
+    ""
   ],
   "SelectedNode": "\\moonfish.py",
   "PreviewInSolutionExplorer": false
